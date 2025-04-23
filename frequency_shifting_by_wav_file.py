@@ -43,37 +43,52 @@ def deslocar_frequencia(input_wav, output_wav, deslocamento_frequencia):
 
     # Salvar o novo arquivo WAV
     wav.write(output_wav, taxa_amostragem, dados_deslocados)
+    print(f"Arquivo deslocado salvo em: {output_wav}")
 
-    # Informações sobre os dados de saída
-    print(f"Amplitude Máxima do Áudio Deslocado: {np.max(dados_deslocados)}")
+    # Visualizações
+    plt.figure(figsize=(14, 10))
 
-    # ** Gráficos para Visualização **
-    plt.figure(figsize=(12, 6))
-
-    # Áudio Original
-    plt.subplot(2, 1, 1)
-    plt.plot(dados[:min(1000, len(dados))], label="Áudio Original", color='blue')
-    plt.title('Áudio Original')
-    plt.xlabel('Amostras')
+    # *** Gráfico 1: Forma de Onda do Áudio Original ***
+    plt.subplot(4, 1, 1)
+    tempo_original = np.linspace(0, len(dados) / taxa_amostragem, num=len(dados))
+    plt.plot(tempo_original, dados, color='blue')
+    plt.title('Forma de Onda - Áudio Original')
+    plt.xlabel('Tempo (s)')
     plt.ylabel('Amplitude')
-    plt.legend()
+    plt.grid()
 
-    # Áudio Deslocado
-    plt.subplot(2, 1, 2)
-    plt.plot(dados_deslocados[:min(1000, len(dados_deslocados))], label="Áudio Deslocado", color='orange')
-    plt.title('Áudio com Frequência Deslocada')
-    plt.xlabel('Amostras')
+    # *** Gráfico 2: Forma de Onda do Áudio Deslocado ***
+    plt.subplot(4, 1, 2)
+    tempo_deslocado = np.linspace(0, len(dados_deslocados) / taxa_amostragem, num=len(dados_deslocados))
+    plt.plot(tempo_deslocado, dados_deslocados, color='orange')
+    plt.title('Forma de Onda - Áudio com Frequência Deslocada')
+    plt.xlabel('Tempo (s)')
     plt.ylabel('Amplitude')
-    plt.legend()
+    plt.grid()
 
-    # Mostrar gráficos
+    # *** Gráfico 3: Espectrograma do Áudio Original ***
+    plt.subplot(4, 1, 3)
+    plt.specgram(dados, Fs=taxa_amostragem, NFFT=2048, noverlap=1024, cmap='viridis')
+    plt.title('Espectrograma - Áudio Original')
+    plt.xlabel('Tempo (s)')
+    plt.ylabel('Frequência (Hz)')
+    plt.colorbar(label='Intensidade (dB)')
+
+    # *** Gráfico 4: Espectrograma do Áudio Deslocado ***
+    plt.subplot(4, 1, 4)
+    plt.specgram(dados_deslocados, Fs=taxa_amostragem, NFFT=2048, noverlap=1024, cmap='magma')
+    plt.title('Espectrograma - Áudio com Frequência Deslocada')
+    plt.xlabel('Tempo (s)')
+    plt.ylabel('Frequência (Hz)')
+    plt.colorbar(label='Intensidade (dB)')
+
+    # Ajustes Finais
     plt.tight_layout()
     plt.show()
 
 
 # Exemplo de uso
 input_wav = 'downloads/original_ytd.wav'  # Caminho do arquivo de entrada
-output_wav = 'downloads/saida_deslocada.wav'  # Caminho do arquivo de saída
-deslocamento_frequencia = 500  # Deslocamento em Hz
-
+output_wav = 'downloads/saida_deslocada_v1.wav'  # Caminho do arquivo de saída
+deslocamento_frequencia = 2000
 deslocar_frequencia(input_wav, output_wav, deslocamento_frequencia)
