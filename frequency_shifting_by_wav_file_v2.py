@@ -1,7 +1,8 @@
+import matplotlib.pyplot as plt
 import numpy as np
 import soundfile as sf
 from scipy.signal import hilbert
-import matplotlib.pyplot as plt
+
 
 def deslocar_frequencia(input_wav, output_wav, deslocamento_hz):
     # Carrega o áudio
@@ -68,6 +69,7 @@ def deslocar_frequencia(input_wav, output_wav, deslocamento_hz):
 
     plt.tight_layout()
     plt.show()
+
 
 # Exemplo de uso
 deslocar_frequencia("downloads/original_ytd.wav", "downloads/saida_deslocada_v2_visual.wav", deslocamento_hz=2000)
