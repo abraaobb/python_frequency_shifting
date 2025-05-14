@@ -1,98 +1,69 @@
-## Me
-crie um arquivo readme para este projeto
+## Técnicas de deslocamento de frequência
 
-## AI Assistant
-# README
+### 🔹 1. **Multiplicação por um cosseno ou seno (modulação AM)**
 
-## Sobre o Projeto
-
-Este projeto realiza o processamento de sinais de áudio utilizando técnicas de análise de sinais complexos e deslocamento de frequência. O objetivo principal é manipular um sinal de áudio gerado e deslocar a sua frequência para outra faixa, possibilitando aplicações nas áreas de telecomunicações, áudio e processamento digital de sinais.
-
-O projeto gera um sinal real de áudio senoidal (original) e, utilizando a Transformada de Hilbert, cria uma versão analítica do sinal. Em seguida, essa versão é usada para realizar um deslocamento de frequência (por multiplicação com uma exponencial complexa). Por fim, o sinal deslocado é salvo em um arquivo de áudio `.wav` e exibido em gráficos comparativos.
+- A técnica mais clássica: multiplicar o sinal por uma função cossenoidal `cos(2πf₀t)` ou senoidal.
+- Isso resulta em **duas réplicas do espectro original**, uma centrada em `+f₀` e outra em `f₀`.
+- Muito comum em **modulação em amplitude (AM)** e em **SSB (Single Side Band)**.
 
 ---
 
-## Funcionalidades
+### 🔹 2. **Multiplicação por exponencial complexa**
 
-- Geração de um sinal senoidal real.
-- Conversão do sinal em sua forma analítica (complexa) utilizando a Transformada de Hilbert.
-- Manipulação do sinal para deslocamento de frequência.
-- Normalização e salvamento do sinal processado em um arquivo de áudio.
-- Visualização gráfica do sinal original e do sinal deslocado.
+- Multiplicação do sinal por `exp(j2πf₀t)` desloca **todo o espectro** para a direita (`+f₀`), sem criar réplica simétrica.
+- Utilizada em sistemas de **modulação complexa**, como QAM e OFDM.
+- Ideal para **deslocamento unilateral**, como em SSB (banda lateral única).
 
 ---
 
-## Tecnologias Utilizadas
+### 🔹 3. **FFT com rotação de espectro (frequência discreta)**
 
-O projeto utiliza as seguintes bibliotecas do Python:
-
-- **NumPy**: Manipulação de arrays e geração de sinais.
-- **Matplotlib**: Criação de gráficos para visualização dos sinais.
-- **SciPy**: Utilização da Transformada de Hilbert e manipulação de áudio.
-- **Matplotlib.pyplot**: Para exibir os gráficos gerados.
+- Você pode realizar a **transformada rápida de Fourier (FFT)**, aplicar uma **rotação ou deslocamento do espectro** no domínio da frequência, e depois aplicar a **IFFT (transformada inversa)**.
+- Muito usada em implementações digitais, principalmente para efeitos em áudio e aplicações em rádio definido por software (SDR).
 
 ---
 
-## Como Executar
+### 🔹 4. **Modulação em banda base / IQ (In-phase e Quadrature)**
 
-### Pré-requisitos
-
-- Python 3.x instalado em sua máquina.
-- As bibliotecas listadas acima. Para instalá-las, execute o comando abaixo:
-
-```shell script
-pip install -r requirements.txt
-```
-
-### Execução do Código
-
-1. Clone este repositório ou copie o script.
-2. Certifique-se de que a estrutura de pastas permite salvar o arquivo de áudio gerado no caminho `downloads/`.
-3. Execute o script para gerar o sinal original, processar o deslocamento de frequência e visualizar os resultados gráficos.
-4. O arquivo de áudio gerado será salvo como `downloads/sinal_deslocado.wav`.
+- Técnica usada em rádios SDR: separar o sinal em componentes **I (coseno)** e **Q (seno)** e fazer processamento digital com esses componentes.
+- Permite controle preciso do deslocamento de frequência e evita aliasing.
+- Essencial em rádios modernos, transmissões digitais e DSP.
 
 ---
 
-## Explicação Técnica
+### 🔹 5. **Hilbert Transform + modulação**
 
-1. **Geração do Sinal Original**:
-   Um sinal senoidal real de 5 kHz é gerado utilizando a função seno (`numpy.sin`) com uma frequência de 44.1 kHz (frequência padrão para áudio).
-
-2. **Transformada de Hilbert**:
-   O sinal real é transformado em sua versão analítica (complexa) para possibilitar manipulações no domínio complexo.
-
-3. **Deslocamento de Frequência**:
-   O sinal analítico é deslocado em -4500 Hz, transformando o sinal original de 5 kHz para 500 Hz.
-
-4. **Normalização e Salvamento**:
-   Após o processamento, o sinal deslocado é normalizado para evitar distorções e salvo em formato `.wav` para reprodução futura.
+- Primeiro aplica-se a **Transformada de Hilbert** para criar um **sinal analítico** (componente complexa).
+- Depois multiplica-se esse sinal analítico por uma exponencial complexa para deslocar a frequência.
+- Essa abordagem evita a duplicação do espectro negativo (ideal para SSB).
+- Muito usado em **SSB, análise de sinais e filtros adaptativos**.
 
 ---
 
-## Resultados
+### 🔹 6. **Interpolação e mudança de taxa (resampling)**
 
-- Gráficos que ilustram o sinal original (5 kHz) e o sinal deslocado (500 Hz).
-- Arquivo de áudio com o sinal processado e deslocado, salvo no diretório `downloads`.
-
----
-
-## Aplicações
-
-Este projeto pode ser utilizado em diversas áreas, incluindo:
-
-- Processamento digital de sinais.
-- Desenvolvimento de sistemas de comunicação.
-- Manipulação e análise de áudio.
-- Pesquisa em sinais e sistemas.
+- Mudar a **taxa de amostragem** (upsampling/downsampling) altera a faixa de frequências representadas no sinal.
+- Embora não seja diretamente um "deslocamento", pode **mover o conteúdo espectral** ao ser combinado com outras técnicas.
 
 ---
 
-## Contribuição
+### 🔹 7. **Pitch shifting com phase vocoder / granular synthesis (áudio)**
 
-Contribuições são bem-vindas! Sinta-se à vontade para abrir issues ou pull requests para melhorias.
+- Em áudio musical, o deslocamento de frequência pode ser feito por vocoders de fase ou por granularização, para mudar o pitch sem alterar o tempo.
+- São técnicas diferentes da modulação clássica, mas também realizam "deslocamento espectral" de uma forma perceptiva.
 
 ---
 
-## Licença
+## Comparação entre as técnicas
 
-Este projeto está sob a licença MIT. Consulte o arquivo `LICENSE` para mais informações.
+| Técnica | Tipo de Sinal | Direção do Deslocamento | Réplica Espectral? | Complexidade | Aplicações Típicas |
+| --- | --- | --- | --- | --- | --- |
+| **Multiplicação por cosseno/seno** | Real | Bilateral (`±f₀`) | Sim (duas bandas) | Baixa | AM, áudio analógico |
+| **Multiplicação por exponencial complexa** | Complexo | Unilateral (`+f₀` ou `-f₀`) | Não | Baixa | OFDM, QAM, SDR |
+| **FFT com rotação espectral** | Real ou complexo | Controlada | Não (ou sim, dependendo do sinal) | Alta (com FFT/IFFT) | Análise de espectro, áudio digital |
+| **Modulação IQ (I/Q)** | Complexo | Unilateral | Não | Média/Alta | Rádio digital, SDR |
+| **Transformada de Hilbert + exponencial complexa** | Real → Complexo | Unilateral | Não | Média | SSB, análise espectral |
+| **Resampling (mudança de taxa)** | Real ou complexo | Indireta (muda faixa útil) | Não aplicável diretamente | Média | DSP, compressão |
+| **Phase vocoder / granular (áudio)** | Real | Perceptivo (pitch/timbre) | Não | Alta | Efeitos de áudio, música |
+
+![myplot.png](assets/myplot.png)
