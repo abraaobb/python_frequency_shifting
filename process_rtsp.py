@@ -1,14 +1,15 @@
-import subprocess
-import numpy as np
-import sounddevice as sd
-from scipy.signal import hilbert
 import queue
+import subprocess
 import threading
 import time
 
+import numpy as np
+import sounddevice as sd
+from scipy.signal import hilbert
+
 sample_rate = 44100
 channels = 1
-chunk_size = 8192  # bloco maior para processar
+chunk_size = 8192
 shift_hz = 400
 
 ffmpeg_cmd = [
@@ -23,7 +24,8 @@ ffmpeg_cmd = [
 
 proc = subprocess.Popen(ffmpeg_cmd, stdout=subprocess.PIPE, stderr=subprocess.DEVNULL)
 
-audio_queue = queue.Queue(maxsize=20)  # buffer entre leitura e áudio
+audio_queue = queue.Queue(maxsize=30)
+
 
 def frequency_shift_hilbert(x, sample_rate, shift_hz):
     analytic_signal = hilbert(x)
@@ -31,8 +33,8 @@ def frequency_shift_hilbert(x, sample_rate, shift_hz):
     shifted = np.real(analytic_signal * np.exp(2j * np.pi * shift_hz * t))
     return shifted.astype(np.float32)
 
+
 def reader_thread():
-    """Lê dados do ffmpeg e coloca na fila"""
     while True:
         raw_data = proc.stdout.read(chunk_size * 2)
         if len(raw_data) < chunk_size * 2:
@@ -40,17 +42,18 @@ def reader_thread():
         audio_data = np.frombuffer(raw_data, dtype=np.int16).astype(np.float32) / 32768.0
         audio_queue.put(audio_data)
 
+
 def callback(outdata, frames, time, status):
     try:
-        data = audio_queue.get(timeout=1)  # espera dados no buffer
+        data = audio_queue.get(timeout=1)
         shifted = frequency_shift_hilbert(data, sample_rate, shift_hz)
         outdata[:len(shifted), 0] = shifted
         if len(shifted) < frames:
             outdata[len(shifted):] = 0
     except queue.Empty:
-        outdata.fill(0)  # silêncio se não tem dados
+        outdata.fill(0)
 
-# Inicia thread de leitura
+
 thread = threading.Thread(target=reader_thread, daemon=True)
 thread.start()
 
